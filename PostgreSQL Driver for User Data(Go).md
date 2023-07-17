@@ -68,10 +68,3 @@ Make sure to replace `"github.com/your-username/your-project-name/pgdriver"` wit
 
 Remember to replace the database connection details (`user=your_user`, `password=your_password`, `dbname=your_db`) with your actual PostgreSQL database credentials.
 
-## Contributing
-
-Contributions are welcome! If you find any issues or have suggestions for improvements, please create an issue or submit a pull request on GitHub.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
