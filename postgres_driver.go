@@ -1,10 +1,8 @@
-package main
+package pgdriver
 
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
-	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -16,33 +14,47 @@ type User struct {
 	Phone  string `json:"phone"`
 }
 
-func main() {
-	db, err := sql.Open("postgres", "user=nekiarie password=Kiariew@njiiri94 dbname=postgresql sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+type UserTable struct {
+	db *sql.DB
+}
 
-	rows, err := db.Query("SELECT * FROM public.user_table")
+func NewUserTable(db *sql.DB) *UserTable {
+	return &UserTable{
+		db: db,
+	}
+}
+
+func (ut *UserTable) GetUsers() ([]User, error) {
+	rows, err := ut.db.Query("SELECT user_id, name, age, phone FROM public.user_table")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var users []User
+	users := []User{}
+
 	for rows.Next() {
 		var user User
 		err := rows.Scan(&user.UserID, &user.Name, &user.Age, &user.Phone)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		users = append(users, user)
 	}
 
-	jsonData, err := json.Marshal(users)
+	return users, nil
+}
+
+func (ut *UserTable) GetUsersJSON() ([]byte, error) {
+	users, err := ut.GetUsers()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	fmt.Println(string(jsonData))
+	jsonData, err := json.Marshal(users)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }
